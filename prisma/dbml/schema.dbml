@@ -1,0 +1,522 @@
+//// ------------------------------------------------------
+//// THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+//// ------------------------------------------------------
+
+Table administrativearea {
+  id Int [pk, increment]
+  name String
+  parent_id Int
+  level Int
+  user_id Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+  user user
+  administrativearea administrativearea
+  other_administrativearea administrativearea [not null]
+  area_policestation area_policestation [not null]
+  community community [not null]
+  grid grid [not null]
+}
+
+Table area_policestation {
+  id Int [pk, increment]
+  police_station_id Int
+  administrative_area_id Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+  administrativearea administrativearea
+  policestation policestation
+}
+
+Table auditrecords {
+  id Int [pk, increment]
+  action_type String
+  request_data Json
+  user_id Int
+  officer_id Int
+  person_id Int
+  status Int
+  request_time DateTime
+  review_time DateTime
+  review_comments String
+  priority Int
+  update_time DateTime
+  updater_id Int
+  create_time DateTime
+  creator_id Int
+  is_delete Boolean [default: false]
+  user_auditrecords_user_idTouser user
+  user_auditrecords_officer_idTouser user
+  user_auditrecords_person_idTouser personalinfo
+  changerecord changerecord [not null]
+  event event [not null]
+}
+
+Table changerecord {
+  id Int [pk, increment]
+  change_time DateTime
+  change_item String
+  content_before String
+  content_after String
+  audit_records_id Int
+  personal_id Int
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+  priority Int
+  auditrecords auditrecords
+  personalinfo personalinfo
+}
+
+Table disabilityinfo {
+  id Int [pk, increment]
+  personal_id Int
+  disability_id String
+  disability_type String
+  disability_subsidy Decimal
+  severe_disability_subsidy Decimal
+  disability_level Int
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+}
+
+Table economicinfo {
+  id Int [pk, increment]
+  personal_id Int
+  planting_breeding String
+  plant_type String
+  plant_quantity Int
+  breeding_type String
+  breeding_quantity Int
+  business_info String
+  business_location String
+  license_number String
+  fire_equipment_type String
+  fire_equipment_quantity Int
+  surveillance_status String
+  surveillance_quantity Int
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+  planting_area Decimal
+}
+
+Table event {
+  id Int [pk, increment]
+  sender_id Int
+  receiver_id Int
+  event_type String
+  link String
+  status String
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+  audit_records_id Int
+  reportinfo_id Int
+  auditrecords auditrecords
+  reportinfo reportinfo
+}
+
+Table familyinfo {
+  id Int [pk, increment]
+  personal_id Int
+  member_id Int
+  member_relation String
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+  household_id String
+}
+
+Table grid {
+  id Int [pk, increment]
+  creator_id Int
+  area_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+  name String
+  grid_leader_id Int
+  administrativearea administrativearea
+  user user
+}
+
+Table grid_police {
+  id Int [pk, increment]
+  grid_user_id Int
+  police_user_id Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean
+}
+
+Table grid_user {
+  id Int [pk, increment]
+  police_user_id Int
+  user_id Int
+  grid_id Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+}
+
+Table healthinfo {
+  id Int [pk, increment]
+  personal_id Int
+  child_number Int
+  special_group String
+  remark_one String
+  remark_two String
+  health_insurance String
+  pension_insurance String
+  vaccination_status String
+  proof_contraindication String
+  marriage_status String
+  supervisor_name String
+  other_conditions String
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+}
+
+Table menu {
+  id Int [pk, increment]
+  pid Int
+  name String
+  url String
+  permissions String
+  menu_type Int
+  icon String
+  sort Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+}
+
+Table menu_role {
+  id Int [pk, increment]
+  role_id Int [not null]
+  menu_id Int [not null]
+  creator_id Int
+  create_time DateTime
+  is_delete Boolean [default: false]
+  update_time DateTime
+  updater_id Int [default: 0]
+}
+
+Table notification {
+  id Int [pk, increment]
+  user_id Int
+  event_id Int
+  is_read Boolean
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+}
+
+Table personalinfo {
+  id Int [pk, increment]
+  name String
+  certificate_type Int
+  id_card String
+  phone String
+  residence String
+  current_address String
+  pinyin String
+  nickname String
+  former_name String
+  date_of_residence DateTime
+  person_classification String
+  classification_reason Json
+  petition String
+  reserve1 String
+  reserve2 String
+  reserve3 String
+  reserve4 String
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+  age Int
+  height Decimal
+  grid_user_id Int
+  gender Boolean
+  head_url String
+  auditrecords_auditrecords_person_idTouser auditrecords [not null]
+  changerecord changerecord [not null]
+}
+
+Table policestation {
+  id Int [pk, increment]
+  name String
+  user_id Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+  area_policestation area_policestation [not null]
+  user user
+  role_user role_user [not null]
+}
+
+Table politicalinfo {
+  id Int [pk, increment]
+  personal_id Int
+  work_unit String
+  position String
+  political_status String
+  party_organization String
+  religion String [default: '无']
+  nationality String
+  education String
+  military_service String
+  school String
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+}
+
+Table propertyinfo {
+  id Int [pk, increment]
+  personal_id Int
+  house_info String
+  house_owner String
+  house_area Decimal
+  hobbies String
+  car_model String
+  car_plate String
+  car_owner String
+  car_color String
+  house_type String
+  house_condition String
+  smoking_status Int
+  volunteer_status Json
+  social_worker Json
+  driving_license_type String
+  create_time DateTime
+  update_time DateTime
+  creator_id Int
+  updater_id Int
+  is_delete Boolean [default: false]
+}
+
+Table reportinfo {
+  id Int [pk, increment]
+  issue_level String
+  classification_basis String
+  image_url String
+  priority Int
+  public_demand String
+  public_opinion String
+  reporter_id Int
+  report_time DateTime
+  report_address String
+  police_id Int
+  police_opinion String
+  processing_time DateTime
+  processing_status String
+  creator_id Int
+  updater_id Int
+  update_time DateTime
+  create_time DateTime
+  is_delete Boolean [default: false]
+  reporter_evaluate String
+  reporter_star_rating Int
+  event event [not null]
+  report_user user
+  police_user user
+}
+
+Table role {
+  id Int [pk, increment]
+  name String [unique, not null]
+  remark String
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+  role_user role_user [not null]
+}
+
+Table role_user {
+  id Int [pk, increment]
+  role_id Int [not null]
+  user_id Int [not null]
+  police_station_id Int
+  grid_id Json
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+  user user [not null]
+  policestation policestation
+  role role [not null]
+}
+
+Table user {
+  id Int [pk, increment]
+  id_card String [unique, not null]
+  username String [unique, not null]
+  password String [not null]
+  real_name String [not null]
+  head_url String
+  gender Int [not null]
+  mobile String [unique, not null]
+  status Int [not null]
+  creator_id Int [not null]
+  create_time DateTime [not null]
+  updater_id Int [not null]
+  update_time DateTime [not null]
+  is_delete Boolean [not null, default: false]
+  personal_id Int
+  administrativearea administrativearea [not null]
+  auditrecords_auditrecords_user_idTouser auditrecords [not null]
+  auditrecords_auditrecords_officer_idTouser auditrecords [not null]
+  grid grid [not null]
+  policestation policestation [not null]
+  reportinfo_report_user reportinfo [not null]
+  reportinfo_police_user reportinfo [not null]
+  role_user role_user [not null]
+}
+
+Table userloglogin {
+  id Int [pk, increment]
+  operation Int
+  status Int
+  user_agent String
+  ip String
+  username String
+  creator_id Int
+  create_time DateTime
+  update_time DateTime
+  updater_id Int
+  is_delete Boolean [default: false]
+}
+
+Table userlogoperation {
+  id Int [pk, increment]
+  operation Int
+  request_query String
+  request_type String
+  request_params String
+  request_time BigInt
+  user_agent String
+  ip String
+  status Int
+  creator_name String
+  creator_id Int
+  create_time DateTime
+  update_time DateTime
+  updater_id Int
+  is_delete Boolean [default: false]
+  description String
+}
+
+Table community {
+  id Int [pk, increment]
+  name String
+  user_id Int
+  administrative_area_id Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+  administrativearea administrativearea
+}
+
+Table community_policestation {
+  id Int [pk, increment]
+  community_id Int
+  police_station_id Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+}
+
+Table grid_community {
+  id Int [pk, increment]
+  grid_id Int
+  community_id Int
+  creator_id Int
+  create_time DateTime
+  updater_id Int
+  update_time DateTime
+  is_delete Boolean [default: false]
+}
+
+Ref: administrativearea.user_id > user.id [delete: No Action]
+
+Ref: administrativearea.parent_id - administrativearea.id [delete: No Action]
+
+Ref: area_policestation.administrative_area_id > administrativearea.id [delete: No Action]
+
+Ref: area_policestation.police_station_id > policestation.id [delete: No Action]
+
+Ref: auditrecords.user_id > user.id [delete: No Action]
+
+Ref: auditrecords.officer_id > user.id [delete: No Action]
+
+Ref: auditrecords.person_id > personalinfo.id [delete: Restrict]
+
+Ref: changerecord.audit_records_id > auditrecords.id [delete: No Action]
+
+Ref: changerecord.personal_id > personalinfo.id [delete: No Action]
+
+Ref: event.audit_records_id > auditrecords.id [delete: Restrict]
+
+Ref: event.reportinfo_id > reportinfo.id [delete: Restrict]
+
+Ref: grid.area_id > administrativearea.id [delete: No Action]
+
+Ref: grid.grid_leader_id > user.id [delete: No Action]
+
+Ref: policestation.user_id > user.id [delete: No Action]
+
+Ref: reportinfo.reporter_id > user.id [delete: No Action]
+
+Ref: reportinfo.police_id > user.id [delete: No Action]
+
+Ref: role_user.user_id > user.id [delete: No Action]
+
+Ref: role_user.police_station_id > policestation.id [delete: No Action]
+
+Ref: role_user.role_id > role.id [delete: No Action]
+
+Ref: community.administrative_area_id > administrativearea.id [delete: Cascade]

@@ -1,0 +1,24 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+	  {
+		"label": "nestdebug", // 任务标签，用于在 launch.json 中引用
+		"type": "shell", // 任务类型为 "shell"，在 shell 中执行命令
+		"command": "npm run start:debug", // 要执行的命令，启动 NestJS 项目的调试模式
+		"isBackground": false, // 设置任务为后台任务，允许调试器在任务运行时启动
+		"group": {
+		  "kind": "build", // 任务组类型为 "build"
+		  "isDefault": true // 将任务设置为默认任务
+		},
+		"presentation": {
+		  "echo": true, // 在终端显示执行的命令
+		  "reveal": "silent", // 在任务开始或结束时不显示终端
+		  "focus": false, // 任务启动时不聚焦终端
+		  "panel": "shared", // 使用共享面板，而不是单独的终端实例
+		  "showReuseMessage": true, // 显示任务重用消息
+		  "clear": false // 在任务启动时不清除终端
+		}
+	  }
+	]
+  }
+  

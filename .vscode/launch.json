@@ -1,0 +1,27 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "type": "node", // 指定调试器类型为 Node.js
+        "request": "launch", // 请求类型为 "launch"，表示启动调试会话
+        "name": "nest", // 配置名称，可以在调试面板中选择
+        "skipFiles": ["<node_internals>/**"], // 调试过程中跳过的文件
+        "program": "${workspaceFolder}/src/main.ts", // 程序的入口文件
+        "preLaunchTask": "nestdebug", // 启动调试会话前执行的任务
+        "outFiles": ["${workspaceFolder}/dist/**/*.js"], // 转译后的输出文件位置
+        "runtimeArgs": ["-r", "ts-node/register"], // 运行时参数，用于启动 ts-node/register
+        "console": "integratedTerminal", // 在集成终端中显示调试输出
+        "protocol": "inspector", // 使用 "inspector" 协议进行调试
+        "internalConsoleOptions": "neverOpen", // 内部控制台选项设置为不打开
+        "sourceMaps": true, // 使用源映射以方便调试 TypeScript
+        "resolveSourceMapLocations": [
+          "${workspaceFolder}/**/*.ts",
+          "!**/node_modules/**"
+        ], // 解析源映射位置
+        "env": {
+          "NODE_ENV": "dev" // 设置环境变量 NODE_ENV 为 "dev"
+        }
+      }
+    ]
+  }
+  

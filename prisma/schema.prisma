@@ -1,0 +1,527 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator dbml {
+  provider = "prisma-dbml-generator"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model administrativearea {
+  id                       Int                  @id @default(autoincrement())
+  name                     String?              @db.VarChar(200)
+  parent_id                Int?
+  level                    Int?                 @db.TinyInt
+  user_id                  Int?
+  creator_id               Int?
+  create_time              DateTime?            @db.DateTime(0)
+  updater_id               Int?
+  update_time              DateTime?            @db.DateTime(0)
+  is_delete                Boolean?             @default(false)
+  user                     user?                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "administrativearea_ibfk_1")
+  administrativearea       administrativearea?  @relation("administrativeareaToadministrativearea", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "administrativearea_ibfk_2")
+  other_administrativearea administrativearea[] @relation("administrativeareaToadministrativearea")
+  area_policestation       area_policestation[]
+  community                community[]
+  grid                     grid[]
+
+  @@index([parent_id], map: "parent_id")
+  @@index([user_id], map: "user_id")
+}
+
+model area_policestation {
+  id                     Int                 @id @default(autoincrement()) @db.UnsignedInt
+  police_station_id      Int?
+  administrative_area_id Int?
+  creator_id             Int?
+  create_time            DateTime?           @db.DateTime(0)
+  updater_id             Int?
+  update_time            DateTime?           @db.DateTime(0)
+  is_delete              Boolean?            @default(false)
+  administrativearea     administrativearea? @relation(fields: [administrative_area_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "area_policestation_ibfk_1")
+  policestation          policestation?      @relation(fields: [police_station_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "area_policestation_ibfk_2")
+
+  @@index([administrative_area_id], map: "administrative_area_id")
+  @@index([police_station_id], map: "police_station_id")
+}
+
+model auditrecords {
+  id                                 Int            @id @default(autoincrement())
+  action_type                        String?        @db.VarChar(50)
+  request_data                       Json?
+  user_id                            Int?
+  officer_id                         Int?
+  person_id                          Int?
+  status                             Int?           @db.TinyInt
+  request_time                       DateTime?      @db.DateTime(0)
+  review_time                        DateTime?      @db.DateTime(0)
+  review_comments                    String?        @db.Text
+  priority                           Int?
+  update_time                        DateTime?      @db.DateTime(0)
+  updater_id                         Int?
+  create_time                        DateTime?      @db.DateTime(0)
+  creator_id                         Int?
+  is_delete                          Boolean?       @default(false)
+  user_auditrecords_user_idTouser    user?          @relation("auditrecords_user_idTouser", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auditrecords_ibfk_1")
+  user_auditrecords_officer_idTouser user?          @relation("auditrecords_officer_idTouser", fields: [officer_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "auditrecords_ibfk_2")
+  user_auditrecords_person_idTouser  personalinfo?  @relation("auditrecords_person_idTouser", fields: [person_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "auditrecords_ibfk_3")
+  changerecord                       changerecord[]
+  event                              event[]
+
+  @@index([officer_id], map: "officer_id")
+  @@index([person_id], map: "person_id")
+  @@index([user_id], map: "user_id")
+}
+
+model changerecord {
+  id               Int           @id @default(autoincrement())
+  change_time      DateTime?     @db.DateTime(0)
+  change_item      String?       @db.VarChar(100)
+  content_before   String?       @db.VarChar(500)
+  content_after    String?       @db.VarChar(500)
+  audit_records_id Int?
+  personal_id      Int?
+  create_time      DateTime?     @db.DateTime(0)
+  update_time      DateTime?     @db.DateTime(0)
+  creator_id       Int?
+  updater_id       Int?
+  is_delete        Boolean?      @default(false)
+  priority         Int?
+  auditrecords     auditrecords? @relation(fields: [audit_records_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "changerecord_ibfk_1")
+  personalinfo     personalinfo? @relation(fields: [personal_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "changerecord_ibfk_2")
+
+  @@index([audit_records_id], map: "audit_records_id")
+  @@index([personal_id], map: "personal_id")
+}
+
+model disabilityinfo {
+  id                        Int       @id @default(autoincrement())
+  personal_id               Int?
+  disability_id             String?   @db.VarChar(100)
+  disability_type           String?   @db.VarChar(100)
+  disability_subsidy        Decimal?  @db.Decimal(10, 2)
+  severe_disability_subsidy Decimal?  @db.Decimal(10, 2)
+  disability_level          Int?
+  create_time               DateTime? @db.DateTime(0)
+  update_time               DateTime? @db.DateTime(0)
+  creator_id                Int?
+  updater_id                Int?
+  is_delete                 Boolean?  @default(false)
+}
+
+model economicinfo {
+  id                      Int       @id @default(autoincrement())
+  personal_id             Int?
+  planting_breeding       String?   @db.VarChar(50)
+  plant_type              String?   @db.VarChar(50)
+  plant_quantity          Int?
+  breeding_type           String?   @db.VarChar(50)
+  breeding_quantity       Int?
+  business_info           String?   @db.VarChar(200)
+  business_location       String?   @db.VarChar(200)
+  license_number          String?   @db.VarChar(100)
+  fire_equipment_type     String?   @db.VarChar(100)
+  fire_equipment_quantity Int?
+  surveillance_status     String?   @db.VarChar(50)
+  surveillance_quantity   Int?
+  create_time             DateTime? @db.DateTime(0)
+  update_time             DateTime? @db.DateTime(0)
+  creator_id              Int?
+  updater_id              Int?
+  is_delete               Boolean?  @default(false)
+  planting_area           Decimal?  @db.Decimal(10, 2)
+}
+
+model event {
+  id               Int           @id @default(autoincrement())
+  sender_id        Int?
+  receiver_id      Int?
+  event_type       String?       @db.VarChar(200)
+  link             String?       @db.VarChar(500)
+  status           String?       @db.VarChar(50)
+  create_time      DateTime?     @db.DateTime(0)
+  update_time      DateTime?     @db.DateTime(0)
+  creator_id       Int?
+  updater_id       Int?
+  is_delete        Boolean?      @default(false)
+  audit_records_id Int?
+  reportinfo_id    Int?
+  auditrecords     auditrecords? @relation(fields: [audit_records_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "event_ibfk_1")
+  reportinfo       reportinfo?   @relation(fields: [reportinfo_id], references: [id], onDelete: Restrict, onUpdate: Restrict, map: "event_ibfk_2")
+
+  @@index([audit_records_id], map: "audit_records_id")
+  @@index([reportinfo_id], map: "reportinfo_id")
+}
+
+model familyinfo {
+  id              Int       @id @default(autoincrement())
+  personal_id     Int?
+  member_id       Int?
+  member_relation String?   @db.VarChar(50)
+  create_time     DateTime? @db.DateTime(0)
+  update_time     DateTime? @db.DateTime(0)
+  creator_id      Int?
+  updater_id      Int?
+  is_delete       Boolean?  @default(false)
+  household_id    String?   @db.VarChar(50)
+}
+
+model grid {
+  id                 Int                 @id @default(autoincrement())
+  creator_id         Int?
+  area_id            Int?
+  create_time        DateTime?           @db.DateTime(0)
+  updater_id         Int?
+  update_time        DateTime?           @db.DateTime(0)
+  is_delete          Boolean?            @default(false)
+  name               String?             @db.VarChar(255)
+  grid_leader_id     Int?
+  administrativearea administrativearea? @relation(fields: [area_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "grid_ibfk_1")
+  user               user?               @relation(fields: [grid_leader_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "grid_ibfk_2")
+
+  @@index([area_id], map: "area_id")
+  @@index([grid_leader_id], map: "grid_leader_id")
+}
+
+model grid_police {
+  id             Int       @id @default(autoincrement())
+  grid_user_id   Int?
+  police_user_id Int?
+  creator_id     Int?
+  create_time    DateTime? @db.DateTime(0)
+  updater_id     Int?
+  update_time    DateTime? @db.DateTime(0)
+  is_delete      Boolean?
+}
+
+model grid_user {
+  id             Int       @id @default(autoincrement())
+  police_user_id Int?
+  user_id        Int?
+  grid_id        Int?
+  creator_id     Int?
+  create_time    DateTime? @db.DateTime(0)
+  updater_id     Int?
+  update_time    DateTime? @db.DateTime(0)
+  is_delete      Boolean?  @default(false)
+}
+
+model healthinfo {
+  id                     Int       @id @default(autoincrement())
+  personal_id            Int?
+  child_number           Int?
+  special_group          String?   @db.VarChar(100)
+  remark_one             String?   @db.VarChar(200)
+  remark_two             String?   @db.VarChar(100)
+  health_insurance       String?   @db.VarChar(100)
+  pension_insurance      String?   @db.VarChar(100)
+  vaccination_status     String?   @db.VarChar(100)
+  proof_contraindication String?   @db.VarChar(100)
+  marriage_status        String?   @db.VarChar(50)
+  supervisor_name        String?   @db.VarChar(100)
+  other_conditions       String?   @db.VarChar(100)
+  create_time            DateTime? @db.DateTime(0)
+  update_time            DateTime? @db.DateTime(0)
+  creator_id             Int?
+  updater_id             Int?
+  is_delete              Boolean?  @default(false)
+}
+
+model menu {
+  id          Int       @id @default(autoincrement())
+  pid         Int?
+  name        String?   @db.VarChar(200)
+  url         String?   @db.VarChar(200)
+  permissions String?   @db.VarChar(500)
+  menu_type   Int?      @db.UnsignedTinyInt
+  icon        String?   @db.VarChar(50)
+  sort        Int?
+  creator_id  Int?
+  create_time DateTime? @db.DateTime(0)
+  updater_id  Int?
+  update_time DateTime? @db.DateTime(0)
+  is_delete   Boolean?  @default(false)
+}
+
+model menu_role {
+  id          Int       @id @default(autoincrement())
+  role_id     Int
+  menu_id     Int
+  creator_id  Int?
+  create_time DateTime? @db.DateTime(0)
+  is_delete   Boolean?  @default(false)
+  update_time DateTime? @db.DateTime(0)
+  updater_id  Int?      @default(0)
+}
+
+model notification {
+  id          Int       @id @default(autoincrement())
+  user_id     Int?
+  event_id    Int?
+  is_read     Boolean?
+  create_time DateTime? @db.DateTime(0)
+  update_time DateTime? @db.DateTime(0)
+  creator_id  Int?
+  updater_id  Int?
+  is_delete   Boolean?  @default(false)
+}
+
+model personalinfo {
+  id                                        Int            @id @default(autoincrement())
+  name                                      String?        @db.VarChar(50)
+  certificate_type                          Int?
+  id_card                                   String?        @db.VarChar(50)
+  phone                                     String?        @db.VarChar(50)
+  residence                                 String?        @db.VarChar(200)
+  current_address                           String?        @db.VarChar(200)
+  pinyin                                    String?        @db.VarChar(100)
+  nickname                                  String?        @db.VarChar(50)
+  former_name                               String?        @db.VarChar(50)
+  date_of_residence                         DateTime?      @db.DateTime(0)
+  person_classification                     String?        @db.VarChar(10)
+  classification_reason                     Json?
+  petition                                  String?        @db.VarChar(255)
+  reserve1                                  String?        @db.VarChar(255)
+  reserve2                                  String?        @db.VarChar(255)
+  reserve3                                  String?        @db.VarChar(255)
+  reserve4                                  String?        @db.VarChar(255)
+  creator_id                                Int?
+  create_time                               DateTime?      @db.DateTime(0)
+  updater_id                                Int?
+  update_time                               DateTime?      @db.DateTime(0)
+  is_delete                                 Boolean?       @default(false)
+  age                                       Int?
+  height                                    Decimal?       @db.Decimal(10, 2)
+  grid_user_id                              Int?
+  gender                                    Boolean?
+  head_url                                  String?        @db.MediumText
+  auditrecords_auditrecords_person_idTouser auditrecords[] @relation("auditrecords_person_idTouser")
+  changerecord                              changerecord[]
+}
+
+model policestation {
+  id                 Int                  @id @default(autoincrement())
+  name               String?              @db.VarChar(200)
+  user_id            Int?
+  creator_id         Int?
+  create_time        DateTime?            @db.DateTime(0)
+  updater_id         Int?
+  update_time        DateTime?            @db.DateTime(0)
+  is_delete          Boolean?             @default(false)
+  area_policestation area_policestation[]
+  user               user?                @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "policestation_ibfk_1")
+  role_user          role_user[]
+
+  @@index([user_id], map: "user_id")
+}
+
+model politicalinfo {
+  id                 Int       @id @default(autoincrement())
+  personal_id        Int?
+  work_unit          String?   @db.VarChar(100)
+  position           String?   @db.VarChar(100)
+  political_status   String?   @db.VarChar(50)
+  party_organization String?   @db.VarChar(50)
+  religion           String?   @default("无") @db.VarChar(100)
+  nationality        String?   @db.VarChar(50)
+  education          String?   @db.VarChar(50)
+  military_service   String?   @db.VarChar(50)
+  school             String?   @db.VarChar(100)
+  create_time        DateTime? @db.DateTime(0)
+  update_time        DateTime? @db.DateTime(0)
+  creator_id         Int?
+  updater_id         Int?
+  is_delete          Boolean?  @default(false)
+}
+
+model propertyinfo {
+  id                   Int       @id @default(autoincrement())
+  personal_id          Int?
+  house_info           String?   @db.VarChar(200)
+  house_owner          String?   @db.VarChar(100)
+  house_area           Decimal?  @db.Decimal(10, 2)
+  hobbies              String?   @db.VarChar(200)
+  car_model            String?   @db.VarChar(50)
+  car_plate            String?   @db.VarChar(50)
+  car_owner            String?   @db.VarChar(50)
+  car_color            String?   @db.VarChar(50)
+  house_type           String?   @db.VarChar(50)
+  house_condition      String?   @db.VarChar(50)
+  smoking_status       Int?
+  volunteer_status     Json?
+  social_worker        Json?
+  driving_license_type String?   @db.VarChar(50)
+  create_time          DateTime? @db.DateTime(0)
+  update_time          DateTime? @db.DateTime(0)
+  creator_id           Int?
+  updater_id           Int?
+  is_delete            Boolean?  @default(false)
+}
+
+model reportinfo {
+  id                   Int       @id @default(autoincrement())
+  issue_level          String?   @db.VarChar(50)
+  classification_basis String?   @db.VarChar(500)
+  image_url            String?   @db.VarChar(1000)
+  priority             Int?
+  public_demand        String?   @db.VarChar(1000)
+  public_opinion       String?   @db.VarChar(1000)
+  reporter_id          Int?
+  report_time          DateTime? @db.DateTime(0)
+  report_address       String?   @db.VarChar(1000)
+  police_id            Int?
+  police_opinion       String?   @db.VarChar(1000)
+  processing_time      DateTime? @db.DateTime(0)
+  processing_status    String?   @db.VarChar(50)
+  creator_id           Int?
+  updater_id           Int?
+  update_time          DateTime? @db.DateTime(0)
+  create_time          DateTime? @db.DateTime(0)
+  is_delete            Boolean?  @default(false)
+  reporter_evaluate    String?   @db.VarChar(500)
+  reporter_star_rating Int?
+  event                event[]
+  report_user          user?     @relation("report_user", fields: [reporter_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reportinfo_ibfk_1")
+  police_user          user?     @relation("police_user", fields: [police_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "reportinfo_ibfk_2")
+
+  @@index([reporter_id], map: "reporter_id")
+  @@index([police_id], map: "police_id")
+}
+
+model role {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique(map: "name") @db.VarChar(50)
+  remark      String?     @db.VarChar(100)
+  creator_id  Int?
+  create_time DateTime?   @db.DateTime(0)
+  updater_id  Int?
+  update_time DateTime?   @db.DateTime(0)
+  is_delete   Boolean?    @default(false)
+  role_user   role_user[]
+}
+
+model role_user {
+  id                Int            @id @default(autoincrement())
+  role_id           Int
+  user_id           Int
+  police_station_id Int?
+  grid_id           Json?
+  creator_id        Int?
+  create_time       DateTime?      @db.DateTime(0)
+  updater_id        Int?
+  update_time       DateTime?      @db.DateTime(0)
+  is_delete         Boolean?       @default(false)
+  user              user           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "role_user_ibfk_1")
+  policestation     policestation? @relation(fields: [police_station_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "role_user_ibfk_2")
+  role              role           @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "role_user_ibfk_3")
+
+  @@index([role_id], map: "role_user_ibfk_1")
+  @@index([user_id], map: "role_user_ibfk_2")
+  @@index([police_station_id], map: "role_user_ibfk_3")
+}
+
+model user {
+  id                                         Int                  @id @default(autoincrement())
+  id_card                                    String               @unique(map: "id_card") @db.VarChar(50)
+  username                                   String               @unique(map: "username") @db.VarChar(50)
+  password                                   String               @db.VarChar(100)
+  real_name                                  String               @db.VarChar(50)
+  head_url                                   String?              @db.MediumText
+  gender                                     Int                  @db.TinyInt
+  mobile                                     String               @unique(map: "mobile") @db.VarChar(25)
+  status                                     Int                  @db.TinyInt
+  creator_id                                 Int
+  create_time                                DateTime             @db.DateTime(0)
+  updater_id                                 Int
+  update_time                                DateTime             @db.DateTime(0)
+  is_delete                                  Boolean              @default(false)
+  personal_id                                Int?
+  administrativearea                         administrativearea[]
+  auditrecords_auditrecords_user_idTouser    auditrecords[]       @relation("auditrecords_user_idTouser")
+  auditrecords_auditrecords_officer_idTouser auditrecords[]       @relation("auditrecords_officer_idTouser")
+  grid                                       grid[]
+  policestation                              policestation[]
+  reportinfo_report_user                     reportinfo[]         @relation("report_user")
+  reportinfo_police_user                     reportinfo[]         @relation("police_user")
+  role_user                                  role_user[]
+}
+
+model userloglogin {
+  id          Int       @id @default(autoincrement())
+  operation   Int?      @db.TinyInt
+  status      Int?      @db.TinyInt
+  user_agent  String?   @db.VarChar(500)
+  ip          String?   @db.VarChar(32)
+  username    String?   @db.VarChar(50)
+  creator_id  Int?
+  create_time DateTime? @db.DateTime(0)
+  update_time DateTime? @db.DateTime(0)
+  updater_id  Int?
+  is_delete   Boolean?  @default(false)
+}
+
+model userlogoperation {
+  id             Int       @id @default(autoincrement())
+  operation      Int?
+  request_query  String?   @db.Text
+  request_type   String?   @db.VarChar(50)
+  request_params String?   @db.Text
+  request_time   BigInt?
+  user_agent     String?   @db.VarChar(500)
+  ip             String?   @db.VarChar(32)
+  status         Int?      @db.UnsignedTinyInt
+  creator_name   String?   @db.VarChar(50)
+  creator_id     Int?
+  create_time    DateTime? @db.DateTime(0)
+  update_time    DateTime? @db.DateTime(0)
+  updater_id     Int?
+  is_delete      Boolean?  @default(false)
+  description    String?   @db.VarChar(255)
+}
+
+model community {
+  id                     Int                 @id @default(autoincrement())
+  name                   String?             @db.VarChar(200)
+  user_id                Int?
+  administrative_area_id Int?
+  creator_id             Int?
+  create_time            DateTime?           @db.DateTime(0)
+  updater_id             Int?
+  update_time            DateTime?           @db.DateTime(0)
+  is_delete              Boolean?            @default(false)
+  administrativearea     administrativearea? @relation(fields: [administrative_area_id], references: [id], onDelete: Cascade, map: "community_ibfk_1")
+
+  @@index([administrative_area_id], map: "administrative_area_id")
+}
+
+model community_policestation {
+  id                Int       @id @default(autoincrement())
+  community_id      Int?
+  police_station_id Int?
+  creator_id        Int?
+  create_time       DateTime? @db.DateTime(0)
+  updater_id        Int?
+  update_time       DateTime? @db.DateTime(0)
+  is_delete         Boolean?  @default(false)
+
+  @@index([community_id], map: "community_id")
+  @@index([police_station_id], map: "police_station_id")
+}
+
+model grid_community {
+  id           Int       @id @default(autoincrement())
+  grid_id      Int?
+  community_id Int?
+  creator_id   Int?
+  create_time  DateTime? @db.DateTime(0)
+  updater_id   Int?
+  update_time  DateTime? @db.DateTime(0)
+  is_delete    Boolean?  @default(false)
+
+  @@index([grid_id], map: "grid_community_ibfk_1")
+  @@index([community_id], map: "grid_community_ibfk_2")
+}
