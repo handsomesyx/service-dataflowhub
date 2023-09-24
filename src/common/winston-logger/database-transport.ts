@@ -12,34 +12,34 @@ export default class DatabaseTransport extends Transport {
     super(options);
   }
 
-  async log(info: LogInfo, callback: VoidFunction): Promise<void> {
-    try {
-      // 确认 Prisma 服务正常
+  // async log(info: LogInfo, callback: VoidFunction): Promise<void> {
+  //   try {
+  //     // 确认 Prisma 服务正常
 
-      // const userCount = await this.prisma.user.count();
-      // console.log('\nstart\n', info, callback, userCount);
-      // 根据 level 分别存储到不同的表
-      console.log('执行醒了 ');
-      if (info.level === 'login') {
-        console.log('执行loginlogin ');
-        console.log('info', info);
-        const loglogin = await this.prisma.userloglogin.create({
-          data: { ...info.meta, create_time: new Date() },
-        });
-      } else if (info.level === 'operation') {
-        console.log('执行到operation日志了');
-        await this.prisma.userlogoperation.create({
-          data: {
-            ...info.meta,
-            description: info.message,
-            create_time: new Date(),
-          },
-        });
-      }
-    } catch (error) {
-      console.log('输出的错误是:', error);
-    }
+  //     // const userCount = await this.prisma.user.count();
+  //     // console.log('\nstart\n', info, callback, userCount);
+  //     // 根据 level 分别存储到不同的表
+  //     console.log('执行醒了 ');
+  //     if (info.level === 'login') {
+  //       console.log('执行loginlogin ');
+  //       console.log('info', info);
+  //       const loglogin = await this.prisma.userloglogin.create({
+  //         data: { ...info.meta, create_time: new Date() },
+  //       });
+  //     } else if (info.level === 'operation') {
+  //       console.log('执行到operation日志了');
+  //       await this.prisma.userlogoperation.create({
+  //         data: {
+  //           ...info.meta,
+  //           description: info.message,
+  //           create_time: new Date(),
+  //         },
+  //       });
+  //     }
+  //   } catch (error) {
+  //     console.log('输出的错误是:', error);
+  //   }
 
-    callback();
-  }
+  //   callback();
+  // }
 }

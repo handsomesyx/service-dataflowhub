@@ -77,6 +77,7 @@
     "ethers": "^6.7.1",
     "exceljs": "^4.3.0",
     "graphql": "16.6.0",
+    "hardhat": "^2.17.3",
     "ioredis": "^5.3.2",
     "ip-address": "^8.1.0",
     "luxon": "^3.3.0",

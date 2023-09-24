@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
-import type { user } from '@prisma/client';
+// import type { user } from '@prisma/client';
 import { Prisma } from '@prisma/client';
 import { log } from 'console';
 import type { Request } from 'express';
@@ -59,71 +59,71 @@ export class AuthService {
   //   }
   // }
 
-  async login(
-    username: string,
-    password: string
-  ): Promise<{ token: Token; userId: number }> {
-    const user = await this.prisma.user.findUnique({ where: { username } });
-    //抛出的异常用于前端验证 1代表用户名错误 2代表密码错误
+  // async login(
+  //   username: string,
+  //   password: string
+  // ): Promise<{ token: Token; userId: number }> {
+  //   const user = await this.prisma.user.findUnique({ where: { username } });
+  //   //抛出的异常用于前端验证 1代表用户名错误 2代表密码错误
 
-    if (!user) {
-      throw new NotFoundException('1');
-    }
-    const userOtherInfo = await this.prisma.role_user.findFirst({
-      where: {
-        user_id: user.id,
-      },
-    });
+  //   if (!user) {
+  //     throw new NotFoundException('1');
+  //   }
+  //   const userOtherInfo = await this.prisma.role_user.findFirst({
+  //     where: {
+  //       user_id: user.id,
+  //     },
+  //   });
 
-    if (!userOtherInfo) {
-      throw new NotFoundException(`没有找到用户角色: ${username}`);
-    }
+  //   if (!userOtherInfo) {
+  //     throw new NotFoundException(`没有找到用户角色: ${username}`);
+  //   }
 
-    const roleObject = await this.prisma.role.findUnique({
-      where: { id: userOtherInfo.role_id },
-    });
+  //   const roleObject = await this.prisma.role.findUnique({
+  //     where: { id: userOtherInfo.role_id },
+  //   });
 
-    if (!roleObject) {
-      throw new NotFoundException('找不到该用户角色');
-    }
-    const passwordValid = await this.passwordService.validatePassword(
-      password,
-      user.password
-    );
+  //   if (!roleObject) {
+  //     throw new NotFoundException('找不到该用户角色');
+  //   }
+  //   const passwordValid = await this.passwordService.validatePassword(
+  //     password,
+  //     user.password
+  //   );
 
-    if (!passwordValid) {
-      throw new BadRequestException('2');
-    }
-    const token = this.generateTokens({
-      userId: user.id,
-      role: roleObject?.name as string,
-      role_id: roleObject?.id,
-    });
-    return { token, userId: user.id };
-  }
+  //   if (!passwordValid) {
+  //     throw new BadRequestException('2');
+  //   }
+  //   const token = this.generateTokens({
+  //     userId: user.id,
+  //     role: roleObject?.name as string,
+  //     role_id: roleObject?.id,
+  //   });
+  //   return { token, userId: user.id };
+  // }
 
-  validateuser(userId: number): Promise<user> {
-    return this.prisma.user.findUnique({
-      where: { id: userId },
-    }) as Promise<user>;
-  }
+  // validateuser(userId: number): Promise<user> {
+  //   return this.prisma.user.findUnique({
+  //     where: { id: userId },
+  //   }) as Promise<user>;
+  // }
 
-  async getuserFromToken(token: string): Promise<User> {
-    const getToken = this.jwtService.decode(token) as {
-      [key: string]: string | number;
-    };
-    if (getToken !== null && 'userId' in getToken && 'role' in getToken) {
-      const id = getToken['userId'];
-      const role = getToken['role'] as string;
-      const role_id = getToken['role_id'] as number;
-      const user = await this.prisma.user.findUnique({
-        where: { id: Number(id) },
-      });
-      if (user) {
-        return { ...user, role: role, role_id: role_id };
-      } else throw new UnauthorizedException();
-    } else throw new UnauthorizedException();
-  }
+  // async getuserFromToken(token: string): Promise<User> {
+  //   const getToken = this.jwtService.decode(token) as {
+  //     [key: string]: string | number;
+  //   };
+  //   if (getToken !== null && 'userId' in getToken && 'role' in getToken) {
+  //     const id = getToken['userId'];
+  //     const role = getToken['role'] as string;
+  //     const role_id = getToken['role_id'] as number;
+  //     const user = await this.prisma.user.findUnique({
+  //       where: { id: Number(id) },
+  //     });
+  //     if (user) {
+  //       return { ...user, role: role, role_id: role_id };
+  //     } else throw new UnauthorizedException();
+  //   } else throw new UnauthorizedException();
+  // }
 
   generateTokens(payload: {
     userId: number;

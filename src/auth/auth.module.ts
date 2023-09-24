@@ -52,18 +52,18 @@ export class AuthModule {
     private usersService: UsersService
   ) {}
 
-  configure(consumer: MiddlewareConsumer): void {
-    consumer
-      .apply((req: Request, res: Response, next: NextFunction) => {
-        session.run(async () => {
-          session.set('userId', this.authService.getUserIdFromRequest(req));
-          const username = await this.usersService.getUsernameById(
-            session.get('userId') ? session.get('userId') : -1
-          );
-          session.set('userName', username);
-          next();
-        });
-      })
-      .forRoutes({ path: '*', method: RequestMethod.ALL });
-  }
+  // configure(consumer: MiddlewareConsumer): void {
+  //   consumer
+  //     .apply((req: Request, res: Response, next: NextFunction) => {
+  //       session.run(async () => {
+  //         session.set('userId', this.authService.getUserIdFromRequest(req));
+  //         const username = await this.usersService.getUsernameById(
+  //           session.get('userId') ? session.get('userId') : -1
+  //         );
+  //         session.set('userName', username);
+  //         next();
+  //       });
+  //     })
+  //     .forRoutes({ path: '*', method: RequestMethod.ALL });
+  // }
 }
