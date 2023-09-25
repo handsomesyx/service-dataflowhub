@@ -2,7 +2,7 @@ import type { NextFunction, Request } from 'express';
 import type { SecurityConfig } from 'src/common/configs/config.interface';
 import { MyLoggerService } from 'src/common/winston-logger/logger';
 import { CurrentUser, UsersService } from 'src/modules/users/users.service';
-import { PrismaService, session } from 'src/prisma.service';
+import { PrismaService } from 'src/prisma.service';
 import type { MiddlewareConsumer } from '@nestjs/common';
 import { Module, RequestMethod } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
