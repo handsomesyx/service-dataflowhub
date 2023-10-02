@@ -2,6 +2,7 @@ import { Controller, Get, Param, Post, UseGuards } from '@nestjs/common';
 
 import { ExampleService } from './example.service';
 import type { user } from '@prisma/client';
+import { ApiResponse } from 'src/common/models/ApiResponse';
 
 @Controller()
 export class ExampleController {
@@ -13,7 +14,7 @@ export class ExampleController {
   }
 
   @Post('/demo')
-  demo(): Promise<user[]> {
-    return this.exampleService.demo();
+  async demo(): Promise<ApiResponse<user[]>> {
+    return ApiResponse.success(await this.exampleService.demo());
   }
 }
