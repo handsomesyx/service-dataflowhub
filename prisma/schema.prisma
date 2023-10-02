@@ -11,32 +11,51 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model role {
-  id               BigInt?
-  role_name        String?   @db.VarChar(64)
-  role_description String?   @db.VarChar(255)
-  create_time      DateTime? @db.DateTime(0)
-  update_time      DateTime? @db.DateTime(0)
-  is_delete        Int?      @db.TinyInt
+  id                        Int                   @id @default(autoincrement())
+  role_name                 String?               @db.VarChar(64)
+  role_description          String?               @db.VarChar(255)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
 
-  @@ignore
+  permission                role_permission_association[]
+  user                      user_role_association[]
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model user {
-  id             BigInt?
-  member_account String?   @db.VarChar(64)
-  role_id        BigInt?
-  name           String?   @db.VarChar(64)
-  avator         String?   @db.VarChar(255)
-  phone          Int?
-  email          String?   @db.VarChar(64)
-  create_time    DateTime? @db.DateTime(0)
-  update_time    DateTime? @db.DateTime(0)
-  is_delete      Int?      @db.TinyInt
+  id                        Int                   @id @default(autoincrement())
+  member_account            String?               @db.VarChar(64) @unique(map: "member_account")
+  name                      String?               @db.VarChar(64)
+  avator                    String?               @db.VarChar(255)
+  phone                     String?               @db.VarChar(11)
+  email                     String?               @db.VarChar(64)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
 
-  @@ignore
+announcements_author        announcements[]
+announcements_sender        announcement_user_association[]
+role                        user_role_association[]
+cart                        cart?
+dictionary_create           dictonary[]          @relation("create_dictonary")
+dictionary_update           dictonary[]          @relation("update_dictonary")
+order                       order[]
+product                     product[]
+@@index(id)
+@@index(member_account)
+}
+
+model user_role_association {
+  user_id                   Int
+  role_id                   Int
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  user                      user                  @relation(fields: [user_id], references: [id])
+  role                      role                  @relation(fields: [role_id], references: [id])
+  @@id([user_id, role_id])
 }
 
 model userloglogin {
@@ -72,202 +91,241 @@ model userlogoperation {
 }
 
 model announcement_user_association {
-  id              Int       @id @default(autoincrement())
-  announcement_id BigInt?
-  member_account  String?   @db.VarChar(64)
-  is_read         Int?      @db.TinyInt
-  create_time     DateTime? @db.DateTime(0)
-  update_time     DateTime? @db.DateTime(0)
-  is_delete       Boolean?
+  user_id                   Int
+  announcement_id           Int
+  is_read                   Boolean               @default(false)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  user                      user                  @relation(fields: [user_id], references: [id])
+  announcements             announcements         @relation(fields: [announcement_id], references: [id])
+  @@id([user_id, announcement_id])
 }
 
 model announcements {
-  id             Int       @id @default(autoincrement())
-  title          String?   @db.VarChar(255)
-  context        String?   @db.Text
-  recipient_type Int?      @db.TinyInt
-  role_ids       String?   @db.VarChar(64)
-  published_date DateTime? @db.DateTime(0)
-  member_account String?   @db.VarChar(64)
-  create_time    DateTime? @db.DateTime(0)
-  update_time    DateTime? @db.DateTime(0)
-  is_delete      Boolean?
+  id                        Int                   @id @default(autoincrement())
+  title                     String?               @db.VarChar(255)
+  content                   String?               @db.Text
+  recipient_type            Int?                  @db.TinyInt
+  role_ids                  String?               @db.VarChar(64)
+  published_time            DateTime?             @db.DateTime(0)
+  user_id                   Int
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+  
+  author                    user                  @relation(fields: [user_id], references: [id])
+  user                      announcement_user_association[]
+  @@index(id)
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model cart {
-  id             BigInt?
-  member_account String?   @db.VarChar(64)
-  total_amount   Decimal?  @db.Decimal(10, 2)
-  create_time    DateTime? @db.DateTime(0)
-  update_time    DateTime? @db.DateTime(0)
-  is_delete      Int?      @db.TinyInt
+  id                        Int                   @id @default(autoincrement())
+  user_id                   Int                   @unique(map: "user_id")
+  total_amount              Decimal?              @db.Decimal(10, 2)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
 
-  @@ignore
+  user                      user                  @relation(fields: [user_id], references: [id])
+  cart_item                 cart_item[]
 }
 
 model cart_item {
-  id                  BigInt    @id
-  cart_id             BigInt?
-  product_id          BigInt?
-  product_name        String?   @db.VarChar(64)
-  product_pic         String?   @db.VarChar(64)
-  product_price       Decimal?  @db.Decimal(10, 2)
-  product_quantity    Int?
-  product_category_id BigInt?
-  create_time         DateTime? @db.DateTime(0)
-  update_time         DateTime? @db.DateTime(0)
-  is_delete           Int?      @db.TinyInt
+  id                        Int                   @id @default(autoincrement())
+  cart_id                   Int
+  product_id                Int?
+  product_name              String?               @db.VarChar(64)
+  product_pic               String?               @db.VarChar(64)
+  product_price             Decimal?              @db.Decimal(10, 2)
+  product_quantity          Int?
+  product_category_id       Int?
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  cart                      cart                  @relation(fields: [cart_id], references: [id])
+  product                   product?              @relation(fields: [product_id], references: [id])
+  product_category          product_category?     @relation(fields: [product_category_id], references: [id])
 }
 
 model dictonary {
-  id             BigInt    @id
-  dict_name      String?   @db.VarChar(64)
-  dict_code      String?   @db.VarChar(64)
-  description    String?   @db.VarChar(255)
-  type           Int?
-  create_account String?   @db.VarChar(64)
-  update_account String?   @db.VarChar(64)
-  create_time    DateTime? @db.DateTime(0)
-  update_time    DateTime? @db.DateTime(0)
-  is_delete      Int?      @db.TinyInt
+  id                        Int                   @id @default(autoincrement())
+  dict_name                 String?               @db.VarChar(64)
+  dict_code                 String?               @db.VarChar(64)
+  description               String?               @db.VarChar(255)
+  type                      Int?
+  create_id                 Int?
+  update_id                 Int?
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  create_user               user?                 @relation("create_dictonary", fields: [create_id], references: [id])
+  update_user               user?                 @relation("update_dictonary", fields: [update_id], references: [id])
+  dictonary_item            dictonary_item[]
 }
 
 model dictonary_item {
-  id             BigInt    @id
-  dict_id        BigInt?
-  item_text      String?   @db.VarChar(64)
-  item_value     String?   @db.VarChar(255)
-  description    String?   @db.VarChar(255)
-  sort           Int?
-  status         Int?
-  create_account String?   @db.VarChar(64)
-  update_account String?   @db.VarChar(64)
-  create_time    DateTime? @db.DateTime(0)
-  update_time    DateTime? @db.DateTime(0)
-  is_delete      Int?      @db.TinyInt
+  id                        Int                   @id @default(autoincrement())
+  dict_id                   Int
+  item_text                 String?               @db.VarChar(64)
+  item_value                String?               @db.VarChar(255)
+  description               String?               @db.VarChar(255)
+  sort                      Int?
+  status                    Int?
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  dictionary                dictonary             @relation(fields: [dict_id], references: [id])
 }
 
 model order {
-  id             BigInt    @id
-  member_account String?   @db.VarChar(64)
-  total_amount   Decimal?  @db.Decimal(10, 2)
-  txn_hash       String?   @db.VarChar(64)
-  pay_amount     Decimal?  @db.Decimal(10, 2)
-  pay_type       Int?
-  status         Int?
-  order_type     Int?
-  delete_tatus   Int?
-  payment_time   DateTime? @db.DateTime(0)
-  delivery_time  DateTime? @db.DateTime(0)
-  receive_time   DateTime? @db.DateTime(0)
-  create_time    DateTime? @db.DateTime(0)
-  update_time    DateTime? @db.DateTime(0)
-  is_delete      Int?      @db.TinyInt
+  id                        Int                   @id @default(autoincrement())
+  user_id                   Int
+  txn_hash                  String?               @db.VarChar(64)
+  total_amount              Decimal?              @db.Decimal(10, 2)
+  pay_amount                Decimal?              @db.Decimal(10, 2)
+  pay_type                  Int?
+  status                    Int?
+  order_type                Int?
+  payment_time              DateTime?             @db.DateTime(0)
+  delivery_time             DateTime?             @db.DateTime(0)
+  receive_time              DateTime?             @db.DateTime(0)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  user                      user                  @relation(fields: [user_id], references: [id])
+  order_item                order_item[]
 }
 
 model order_item {
-  id                  BigInt    @id
-  order_id            BigInt?
-  product_id          BigInt?
-  product_name        String?   @db.VarChar(64)
-  product_pic         String?   @db.VarChar(64)
-  product_price       Decimal?  @db.Decimal(10, 2)
-  product_quantity    Int?
-  product_category_id BigInt?
-  create_time         DateTime? @db.DateTime(0)
-  update_time         DateTime? @db.DateTime(0)
-  is_delete           Int?      @db.TinyInt
+  id                        Int                   @id @default(autoincrement())
+  order_id                  Int
+  product_id                Int?
+  product_category_id       Int?
+  product_name              String?               @db.VarChar(64)
+  product_pic               String?               @db.VarChar(64)
+  product_price             Decimal?              @db.Decimal(10, 2)
+  product_quantity          Int?
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  order                     order                 @relation(fields: [order_id], references: [id])
+  product                   product?              @relation(fields: [product_id], references: [id])
+  product_category          product_category?     @relation(fields: [product_category_id], references: [id])
 }
 
 model permission {
-  id                     BigInt    @id
-  permission_name        String?   @db.VarChar(64)
-  permission_description String?   @db.VarChar(255)
-  create_time            DateTime? @db.DateTime(0)
-  update_time            DateTime? @db.DateTime(0)
-  is_delete              Int?      @db.TinyInt
-}
+  id                        Int                   @id @default(autoincrement())
+  permission_name           String?               @db.VarChar(64)
+  permission_description    String?               @db.VarChar(255)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
 
-model product {
-  id             BigInt    @id
-  current_owner  String?   @db.VarChar(64)
-  token_contract String?   @db.VarChar(64)
-  token_id       Int?
-  token_standard String?   @db.VarChar(64)
-  blockchain     String?   @db.VarChar(64)
-  name           String?   @db.VarChar(64)
-  pic            String?   @db.VarChar(255)
-  delete_status  Int?      @db.TinyInt
-  sort           Int?
-  price          Decimal?  @db.Decimal(10, 2)
-  sub_title      String?   @db.VarChar(255)
-  description    String?   @db.Text
-  total          Int?
-  stock          Int?
-  uint           String?   @db.VarChar(16)
-  keywords       String?   @db.VarChar(255)
-  note           String?   @db.VarChar(255)
-  create_time    DateTime? @db.DateTime(0)
-  update_time    DateTime? @db.DateTime(0)
-  is_delete      Int?      @db.TinyInt
-}
-
-model product_attribute {
-  id          BigInt    @id
-  category_id BigInt?
-  name        String?   @db.VarChar(64)
-  select_type Int?
-  input_type  Int?
-  input_list  String?   @db.VarChar(255)
-  sort        Int?
-  create_time DateTime? @db.DateTime(0)
-  update_time DateTime? @db.DateTime(0)
-  is_delete   Int?      @db.TinyInt
-}
-
-model product_attribute_value {
-  id                   BigInt    @id
-  product_id           BigInt?
-  product_attribute_id BigInt?
-  value                String?   @db.VarChar(64)
-  create_time          DateTime? @db.DateTime(0)
-  update_time          DateTime? @db.DateTime(0)
-  is_delete            Int?      @db.TinyInt
-}
-
-model product_category {
-  id          BigInt    @id
-  parent_id   BigInt?
-  name        String?   @db.VarChar(64)
-  level       Int?
-  show_status Int?
-  sort        Int?
-  keywords    String?   @db.VarChar(255)
-  parent_ids  String?   @db.VarChar(255)
-  discription String?   @db.VarChar(255)
-  create_time DateTime? @db.DateTime(0)
-  update_time DateTime? @db.DateTime(0)
-  is_delete   Int?      @db.TinyInt
+  role                      role_permission_association[]
 }
 
 model role_permission_association {
-  id            BigInt    @id @default(autoincrement())
-  role_id       BigInt?
-  permission_id BigInt?
-  create_time   DateTime? @db.DateTime(0)
-  update_time   DateTime? @db.DateTime(0)
-  is_delete     Int?      @db.TinyInt
+  role_id                   Int
+  permission_id             Int
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  role                      role                  @relation(fields: [role_id], references: [id])
+  permission                permission            @relation(fields: [permission_id], references: [id])
+  @@id([role_id, permission_id])
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
-model user_role_association {
-  id             BigInt?
-  member_account String?   @db.VarChar(64)
-  role_id        BigInt?
-  create_time    DateTime? @db.DateTime(0)
-  update_time    DateTime? @db.DateTime(0)
-  is_delete      Int?      @db.TinyInt
+model product {
+  id                        Int                   @id @default(autoincrement())
+  user_id                   Int
+  current_owner             String?               @db.VarChar(64)
+  token_contract            String?               @db.VarChar(64)
+  token_id                  Int?
+  token_standard            String?               @db.VarChar(64)
+  blockchain                String?               @db.VarChar(64)
+  name                      String?               @db.VarChar(64)
+  pic                       String?               @db.VarChar(255)
+  status                    Int?                  @db.TinyInt
+  sort                      Int?
+  price                     Decimal?              @db.Decimal(10, 2)
+  sub_title                 String?               @db.VarChar(255)
+  description               String?               @db.Text
+  total                     Int?
+  stock                     Int?
+  uint                      String?               @db.VarChar(16)
+  keywords                  String?               @db.VarChar(255)
+  note                      String?               @db.VarChar(255)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
 
-  @@ignore
+  cart_item                 cart_item[]
+  order_item                order_item[]
+  user                      user                  @relation(fields: [user_id], references: [id])
+  product_attribute   product_attribute_value[]
 }
+
+model product_category {
+  id                        Int                   @id @default(autoincrement())
+  parent_id                 Int
+  name                      String?               @db.VarChar(64)
+  level                     Int?
+  show_status               Int?
+  sort                      Int?
+  keywords                  String?               @db.VarChar(255)
+  parent_ids                String?               @db.VarChar(255)
+  discription               String?               @db.VarChar(255)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  cart_item                 cart_item[]
+  order_item                order_item[]
+  predecessor               product_category?     @relation("product_category_history", fields: [parent_id], references: [id])
+  successor                 product_category[]     @relation("product_category_history")
+  product_attribute         product_attribute[]
+}
+
+model product_attribute {
+  id                        Int                   @id @default(autoincrement())
+  category_id               Int
+  name                      String?               @db.VarChar(64)
+  select_type               Int?
+  input_type                Int?
+  input_list                String?               @db.VarChar(255)
+  sort                      Int?
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  product_category          product_category      @relation(fields: [category_id], references: [id])
+  product                   product_attribute_value[]
+}
+
+model product_attribute_value {
+  product_id                Int
+  product_attribute_id      Int
+  value                     String?               @db.VarChar(255)
+  create_time               DateTime?             @db.DateTime(0)
+  update_time               DateTime?             @db.DateTime(0)
+  is_delete                 Boolean?              @default(false)
+
+  product                   product               @relation(fields: [product_id], references: [id])
+  product_attribute         product_attribute     @relation(fields: [product_attribute_id], references: [id])
+  
+  @@id([product_id, product_attribute_id])
+}
+
+
+
+
+
+
